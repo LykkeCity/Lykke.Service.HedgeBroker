@@ -1,6 +1,6 @@
 HedgeBrokerService:
     Db:
-        LogsConnString:
+        LogsConnectionString:
             settings-key: LogsConnectionString
             types:
               - AzureTableStorage
