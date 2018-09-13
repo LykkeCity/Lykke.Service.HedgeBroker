@@ -26,7 +26,7 @@ namespace Lykke.Service.HedgeBroker
                 options.Logs = logs =>
                 {
                     logs.AzureTableName = "HedgeBrokerLog";
-                    logs.AzureTableConnectionStringResolver = settings => settings.HedgeBrokerService.Db.LogsConnString;
+                    logs.AzureTableConnectionStringResolver = settings => settings.HedgeBrokerService.Db.LogsConnectionString;
                 };
             });
         }
