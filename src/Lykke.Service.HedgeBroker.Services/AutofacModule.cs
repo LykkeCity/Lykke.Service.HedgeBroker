@@ -10,7 +10,7 @@ using Lykke.Service.HedgeBroker.Services.OrderBooks;
 
 namespace Lykke.Service.HedgeBroker.Services
 {
-    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    [UsedImplicitly]
     public class AutofacModule : Module
     {
         private readonly string _exchangeName;
@@ -28,6 +28,7 @@ namespace Lykke.Service.HedgeBroker.Services
         {
             RegisterExchanges(builder);
             RegisterOrderBooks(builder);
+            RegisterServices(builder);
         }
 
         private void RegisterExchanges(ContainerBuilder builder)

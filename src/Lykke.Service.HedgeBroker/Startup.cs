@@ -22,7 +22,7 @@ namespace Lykke.Service.HedgeBroker
             return services.BuildServiceProvider<AppSettings>(options =>
             {
                 options.SwaggerOptions = _swaggerOptions;
-
+                
                 options.Logs = logs =>
                 {
                     logs.AzureTableName = "HedgeBrokerLog";

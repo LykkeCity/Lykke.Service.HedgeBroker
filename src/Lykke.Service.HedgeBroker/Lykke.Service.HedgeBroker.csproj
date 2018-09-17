@@ -29,6 +29,9 @@
     <ProjectReference Include="..\Lykke.Service.HedgeBroker.Core\Lykke.Service.HedgeBroker.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.HedgeBroker.Services\Lykke.Service.HedgeBroker.Services.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <ItemGroup>
       <DocFile Include="$(OutputPath)$(AssemblyName).xml" />
