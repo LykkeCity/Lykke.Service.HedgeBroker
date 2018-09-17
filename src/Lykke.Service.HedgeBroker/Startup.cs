@@ -4,6 +4,7 @@ using Lykke.Service.HedgeBroker.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Lykke.Service.HedgeBroker.Middleware;
 
 namespace Lykke.Service.HedgeBroker
 {
@@ -37,6 +38,14 @@ namespace Lykke.Service.HedgeBroker
             app.UseLykkeConfiguration(options =>
             {
                 options.SwaggerOptions = _swaggerOptions;
+
+                options.WithMiddleware = builder =>
+                {
+                    builder.UseExceptionHandler(opt =>
+                    {
+                        opt.RegisterExceptionHandler();
+                    });
+                };
             });
         }
     }
