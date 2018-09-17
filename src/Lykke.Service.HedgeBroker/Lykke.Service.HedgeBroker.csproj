@@ -26,11 +26,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.HedgeBroker.AzureRepositories\Lykke.Service.HedgeBroker.AzureRepositories.csproj" />
-    <ProjectReference Include="..\Lykke.Service.HedgeBroker.Domain\Lykke.Service.HedgeBroker.Domain.csproj" />
-    <ProjectReference Include="..\Lykke.Service.HedgeBroker.DomainServices\Lykke.Service.HedgeBroker.DomainServices.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Lykke.Service.HedgeBroker.Core\Lykke.Service.HedgeBroker.Core.csproj" />
+    <ProjectReference Include="..\Lykke.Service.HedgeBroker.Services\Lykke.Service.HedgeBroker.Services.csproj" />
   </ItemGroup>
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <ItemGroup>
