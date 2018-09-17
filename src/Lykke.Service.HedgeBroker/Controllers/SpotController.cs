@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
+using AzureStorage.Queue;
 using Common.Log;
 using Lykke.Common.ExchangeAdapter.SpotController;
 using Lykke.Common.ExchangeAdapter.SpotController.Records;
@@ -27,6 +29,8 @@ namespace Lykke.Service.HedgeBroker.Controllers
         [SwaggerOperation("CancelOrder")]
         [HttpPost("cancelOrder")]
         [ProducesResponseType(typeof(CancelLimitOrderResponse), 200)]
+        [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.InternalServerError)]
         public Task<CancelLimitOrderResponse> CancelLimitOrderAsync([FromBody]CancelLimitOrderRequest request)
         {
             return _exchangeService.CancelLimitOrderAsync(request.OrderId);
@@ -35,6 +39,8 @@ namespace Lykke.Service.HedgeBroker.Controllers
         [SwaggerOperation("CreateLimitOrder")]
         [HttpPost("createLimitOrder")]
         [ProducesResponseType(typeof(OrderIdResponse), 200)]
+        [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.InternalServerError)]
         public Task<OrderIdResponse> CreateLimitOrderAsync([FromBody]LimitOrderRequest request)
         {
             return _exchangeService.CreateLimitOrderAsync(request);
@@ -43,6 +49,8 @@ namespace Lykke.Service.HedgeBroker.Controllers
         [SwaggerOperation("CreateMarketOrder")]
         [HttpPost("createMarketOrder")]
         [ProducesResponseType(typeof(OrderIdResponse), 200)]
+        [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.InternalServerError)]
         public Task<OrderIdResponse> CreateMarketOrderAsync([FromBody]MarketOrderRequest request)
         {
             return _exchangeService.CreateMarketOrderAsync(request);
@@ -91,6 +99,8 @@ namespace Lykke.Service.HedgeBroker.Controllers
         [SwaggerOperation("ReplaceLimitOrder")]
         [HttpPost("replaceLimitOrder")]
         [ProducesResponseType(typeof(OrderIdResponse), 200)]
+        [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.InternalServerError)]
         public Task<OrderIdResponse> ReplaceLimitOrderAsync([FromBody] ReplaceLimitOrderRequest request)
         {
             return _exchangeService.ReplaceLimitOrderAsync(request);
