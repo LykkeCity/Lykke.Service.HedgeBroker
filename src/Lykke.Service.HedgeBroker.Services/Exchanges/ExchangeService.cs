@@ -28,14 +28,39 @@ namespace Lykke.Service.HedgeBroker.Services.Exchanges
             return _externalExchange.CancelLimitOrderAsync(_exchange, limitOrderId);
         }
 
+        public Task<OrderIdResponse> CreateMarketOrderAsync(MarketOrderRequest marketOrderRequest)
+        {
+            return _externalExchange.CreateMarketOrderAsync(_exchange, marketOrderRequest);
+        }
+
         public Task<OrderModel> GetLimitOrderAsync(string limitOrderId)
         {
             return _externalExchange.GetLimitOrderAsync(_exchange, limitOrderId);
         }
 
+        public Task<GetLimitOrdersResponse> GetLimitOrdersAsync()
+        {
+            return _externalExchange.GetLimitOrdersAsync(_exchange);
+        }
+
+        public Task<OrderModel> GetMarketOrderAsync(string orderId)
+        {
+            return _externalExchange.GetMarketOrderAsync(_exchange, orderId);
+        }
+
         public Task<GetWalletsResponse> GetBalancesAsync()
         {
             return _externalExchange.GetBalancesAsync(_exchange);
+        }
+
+        public Task<GetOrdersHistoryResponse> GetOrdersHistoryAsync()
+        {
+            return _externalExchange.GetOrdersHistoryAsync(_exchange);
+        }
+
+        public Task<OrderIdResponse> ReplaceLimitOrderAsync(ReplaceLimitOrderRequest replaceLimitOrderRequest)
+        {
+            return _externalExchange.ReplaceLimitOrderAsync(_exchange, replaceLimitOrderRequest);
         }
     }
 }

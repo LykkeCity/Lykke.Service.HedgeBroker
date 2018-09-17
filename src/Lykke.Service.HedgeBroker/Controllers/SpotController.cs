@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Common.ExchangeAdapter.SpotController;
 using Lykke.Common.ExchangeAdapter.SpotController.Records;
@@ -46,7 +45,7 @@ namespace Lykke.Service.HedgeBroker.Controllers
         [ProducesResponseType(typeof(OrderIdResponse), 200)]
         public Task<OrderIdResponse> CreateMarketOrderAsync([FromBody]MarketOrderRequest request)
         {
-            throw new NotImplementedException();
+            return _exchangeService.CreateMarketOrderAsync(request);
         }
 
         [SwaggerOperation("GetLimitOrders")]
@@ -54,7 +53,7 @@ namespace Lykke.Service.HedgeBroker.Controllers
         [ProducesResponseType(typeof(GetLimitOrdersResponse), 200)]
         public Task<GetLimitOrdersResponse> GetLimitOrdersAsync()
         {
-            throw new NotImplementedException();
+            return _exchangeService.GetLimitOrdersAsync();
         }
 
         [SwaggerOperation("GetOrdersHistory")]
@@ -62,7 +61,7 @@ namespace Lykke.Service.HedgeBroker.Controllers
         [ProducesResponseType(typeof(GetOrdersHistoryResponse), 200)]
         public Task<GetOrdersHistoryResponse> GetOrdersHistoryAsync()
         {
-            throw new NotImplementedException();
+            return _exchangeService.GetOrdersHistoryAsync();
         }
 
         [SwaggerOperation("GetWalletBalances")]
@@ -86,7 +85,7 @@ namespace Lykke.Service.HedgeBroker.Controllers
         [ProducesResponseType(typeof(OrderModel), 200)]
         public Task<OrderModel> MarketOrderStatusAsync(string orderId)
         {
-            throw new NotImplementedException();
+            return _exchangeService.GetMarketOrderAsync(orderId);
         }
         
         [SwaggerOperation("ReplaceLimitOrder")]
@@ -94,7 +93,7 @@ namespace Lykke.Service.HedgeBroker.Controllers
         [ProducesResponseType(typeof(OrderIdResponse), 200)]
         public Task<OrderIdResponse> ReplaceLimitOrderAsync([FromBody] ReplaceLimitOrderRequest request)
         {
-            throw new NotImplementedException();
+            return _exchangeService.ReplaceLimitOrderAsync(request);
         }
-        }
+    }
 }

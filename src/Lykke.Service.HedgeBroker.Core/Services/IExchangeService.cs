@@ -9,8 +9,18 @@ namespace Lykke.Service.HedgeBroker.Core.Services
 
         Task<CancelLimitOrderResponse> CancelLimitOrderAsync(string limitOrderId);
 
+        Task<OrderIdResponse> CreateMarketOrderAsync(MarketOrderRequest request);
+
         Task<OrderModel> GetLimitOrderAsync(string limitOrderId);
 
+        Task<GetLimitOrdersResponse> GetLimitOrdersAsync();
+
+        Task<OrderModel> GetMarketOrderAsync(string orderId);
+
         Task<GetWalletsResponse> GetBalancesAsync();
+        
+        Task<GetOrdersHistoryResponse> GetOrdersHistoryAsync();
+        
+        Task<OrderIdResponse> ReplaceLimitOrderAsync(ReplaceLimitOrderRequest request);
     }
 }

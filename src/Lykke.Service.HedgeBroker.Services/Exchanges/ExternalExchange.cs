@@ -6,7 +6,6 @@ using Common;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.ExchangeAdapter.Client;
-using Lykke.Common.ExchangeAdapter.Contracts;
 using Lykke.Common.ExchangeAdapter.SpotController;
 using Lykke.Common.ExchangeAdapter.SpotController.Records;
 using Lykke.Common.Log;
@@ -33,153 +32,112 @@ namespace Lykke.Service.HedgeBroker.Services.Exchanges
             _log = logFactory.CreateLog(this);
         }
 
-        public async Task<OrderIdResponse> CreateLimitOrderAsync(string exchange, LimitOrderRequest limitOrderRequest)
+        public Task<OrderIdResponse> CreateLimitOrderAsync(string exchange, LimitOrderRequest limitOrderRequest)
         {
-            // TODO: get a volume accuracy from external instrument settings
-            int volumeAccuracy = 6;
-
-            if (limitOrderRequest.TradeType == TradeType.Buy)
-            {
-                decimal fee = await GetFeeAsync(exchange);
-
-                limitOrderRequest.Volume =
-                    Math.Round(limitOrderRequest.Volume * (1 + fee), volumeAccuracy);
-            }
-
-            _log.Info("External exchange create limit order request.", new
-            {
-                request = $"data: {limitOrderRequest.ToJson()}",
-                originalVolume = limitOrderRequest.Volume,
-                exchange
-            });
-
-            OrderIdResponse response;
-
-            try
-            {
-                ISpotController spotController = _exchangeAdapterClientFactory.GetSpotController(exchange);
-
-                response = await spotController.CreateLimitOrderAsync(limitOrderRequest);
-            }
-            catch (Exception exception)
-            {
-                _log.Error(exception, "An error occurred during creating limit orders", limitOrderRequest);
-                throw;
-            }
-
-            _log.Info("External exchange create limit order response.", new
-            {
-                response = $"data: {response.ToJson()}",
-                originalVolume = limitOrderRequest.Volume,
-                exchange
-            });
-
-            return response;
+            return ExecuteAsync(
+                spotController => spotController.CreateLimitOrderAsync(limitOrderRequest),
+                "External exchange create limit order",
+                exchange,
+                new
+                {
+                    request = $"data: {limitOrderRequest.ToJson()}",
+                    originalVolume = limitOrderRequest.Volume,
+                    exchange
+                });
         }
 
-        public async Task<CancelLimitOrderResponse> CancelLimitOrderAsync(string exchange, string limitOrderId)
+        public Task<CancelLimitOrderResponse> CancelLimitOrderAsync(string exchange, string limitOrderId)
         {
             var cancelLimitOrderRequest = new CancelLimitOrderRequest
             {
                 OrderId = limitOrderId
             };
 
-            _log.Info("External exchange cancel limit order request", new
-            {
-                request = $"data: {cancelLimitOrderRequest.ToJson()}",
-                exchange
-            });
+            return ExecuteAsync(
+                spotController => spotController.CancelLimitOrderAsync(cancelLimitOrderRequest),
+                "External exchange cancel limit order",
+                exchange,
+                cancelLimitOrderRequest);
+        }
 
-            CancelLimitOrderResponse response;
-
-            try
-            {
-                ISpotController spotController = _exchangeAdapterClientFactory.GetSpotController(exchange);
-
-                response = await spotController.CancelLimitOrderAsync(cancelLimitOrderRequest);
-            }
-            catch (Exception exception)
-            {
-                _log.Error(exception, "An error occurred during cancelling limit orders", new
+        public Task<OrderModel> GetLimitOrderAsync(string exchange, string limitOrderId)
+        {
+            return ExecuteAsync(
+                spotController => spotController.LimitOrderStatusAsync(limitOrderId),
+                "External exchange get limit order status",
+                exchange,
+                new
                 {
                     limitOrderId,
                     exchange
                 });
-
-                throw;
-            }
-
-            _log.Info("External exchange cancel limit order response.", new
-            {
-                responce = $"data: {response.ToJson()}",
-                exchange
-            });
-
-            return response;
         }
 
-        public async Task<OrderModel> GetLimitOrderAsync(string exchange, string limitOrderId)
+        public Task<GetLimitOrdersResponse> GetLimitOrdersAsync(string exchange)
         {
-            _log.Info("External exchange get limit order status request.", new
-            {
-                limitOrderId,
-                exchange
-            });
-
-            OrderModel orderModel;
-
-            try
-            {
-                ISpotController spotController = _exchangeAdapterClientFactory.GetSpotController(exchange);
-
-                orderModel = await spotController.LimitOrderStatusAsync(limitOrderId);
-            }
-            catch (Exception exception)
-            {
-                _log.Error(exception, "An error occurred during getting limit orders", new
+            return ExecuteAsync(
+                spotController => spotController.GetLimitOrdersAsync(),
+                "External exchange get limit orders",
+                exchange,
+                new
                 {
-                    limitOrderId,
                     exchange
                 });
-
-                throw;
-            }
-
-            _log.Info("External exchange get limit order status response.", new
-            {
-                response = $"data: {orderModel.ToJson()}",
-                exchange
-            });
-
-            return orderModel;
         }
 
-        public async Task<GetWalletsResponse> GetBalancesAsync(string exchange)
+        public Task<GetWalletsResponse> GetBalancesAsync(string exchange)
         {
-            _log.Info("External exchange get balances request.", new { exchange });
+            return ExecuteAsync(
+                spotController => spotController.GetWalletBalancesAsync(),
+                "External exchange get balances",
+                exchange,
+                new
+                {
+                    exchange
+                });
+        }
 
-            GetWalletsResponse response;
+        public Task<OrderIdResponse> CreateMarketOrderAsync(string exchange, MarketOrderRequest request)
+        {
+            return ExecuteAsync(
+                spotController => spotController.CreateMarketOrderAsync(request),
+                "External exchange create market order",
+                exchange,
+                request);
+        }
 
-            try
-            {
-                ISpotController spotController = _exchangeAdapterClientFactory.GetSpotController(exchange);
+        public Task<OrderModel> GetMarketOrderAsync(string exchange, string orderId)
+        {
+            return ExecuteAsync(
+                spotController => spotController.MarketOrderStatusAsync(orderId),
+                "External exchange get market order status",
+                exchange,
+                new
+                {
+                    orderId
+                }
+            );
+        }
 
-                response = await spotController.GetWalletBalancesAsync();
-            }
-            catch (Exception exception)
-            {
-                _log.Error(exception, "An error occurred during getting balances", new { exchange });
+        public Task<GetOrdersHistoryResponse> GetOrdersHistoryAsync(string exchange)
+        {
+            return ExecuteAsync(
+                spotController => spotController.GetOrdersHistoryAsync(),
+                "External exchange get orders history",
+                exchange,
+                new
+                {
+                    exchange
+                });
+        }
 
-                throw;
-            }
-
-            _log.Info("External exchange get balances response.", new
-            {
-                response = $"data: {response.ToJson()}",
-                exchange
-            });
-
-            return response;
+        public Task<OrderIdResponse> ReplaceLimitOrderAsync(string exchange, ReplaceLimitOrderRequest request)
+        {
+            return ExecuteAsync(
+                spotController => spotController.ReplaceLimitOrderAsync(request),
+                "External exchange replace limit order",
+                exchange,
+                request);
         }
 
         private async Task<decimal> GetFeeAsync(string exchange)
@@ -189,5 +147,34 @@ namespace Lykke.Service.HedgeBroker.Services.Exchanges
 
             return externalExchangeSettings.FirstOrDefault(o => o.Name == exchange)?.Fee ?? decimal.Zero;
         }
+        
+        private async Task<TResponse> ExecuteAsync<TResponse>(Func<ISpotController, Task<TResponse>> action,
+            string process, string exchange, object context)
+        {
+            _log.Info($"{process} request", context);
+
+            TResponse response;
+
+            try
+            {
+                ISpotController spotController = _exchangeAdapterClientFactory.GetSpotController(exchange);
+
+                response = await action(spotController);
+            }
+            catch (Exception exception)
+            {
+                _log.Error(exception, $"An error occurred during processing '{process}'", context);
+                throw;
+            }
+
+            _log.Info($"{process} response", new
+            {
+                responce = $"data: {response.ToJson()}",
+                exchange
+            });
+
+            return response;
+        }
+
     }
 }
