@@ -1,22 +1,26 @@
 HedgeBrokerService:
     Db:
-        LogsConnString:
-            settings-key: LogsConnString
+        LogsConnectionString:
+            settings-key: HedgeBrokerService-LogsConnectionString
             types:
               - AzureTableStorage
-HedgeBrokerJob:
-  Db:
-    LogsConnString:
-      settings-key: LogsConnString
-      types:
-        - AzureTableStorage
-  Rabbit:
-    ConnectionString:
-      settings-key: ConnectionString
-      types:
-        - RabbitMq
-    ExchangeName:
-      settings-key: ExchangeName
+    Rabbit:
+      ConnectionString:
+        settings-key: HedgeBrokerService-Rabbit-ConnectionString
+        types:
+          - RabbitMq
+      Exchange:
+        settings-key: HedgeBrokerService-Rabbit-Exchange
+
+    Exchanges:
+        External:
+            settings-key: HedgeBrokerService-Exchanges-External
+            types:
+                - JsonArray
+
+    Exchange:
+        settings-key: HedgeBrokerService-Proxy-Exchange
+
 SlackNotifications:
     AzureQueue:
         ConnectionString:

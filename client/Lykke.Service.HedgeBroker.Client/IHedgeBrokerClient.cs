@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Lykke.Common.ExchangeAdapter.SpotController;
 
 namespace Lykke.Service.HedgeBroker.Client
 {
@@ -8,11 +9,7 @@ namespace Lykke.Service.HedgeBroker.Client
     [PublicAPI]
     public interface IHedgeBrokerClient
     {
-        // Make your app's controller interfaces visible by adding corresponding properties here.
-        // NO actual methods should be placed here (these go to controller interfaces, for example - IHedgeBrokerApi).
-        // ONLY properties for accessing controller interfaces are allowed.
-
-        /// <summary>Application Api interface</summary>
-        IHedgeBrokerApi Api { get; }
+        /// <summary>Spot API</summary>
+        ISpotController SpotApi { get; }
     }
 }
