@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using Common;
 using Common.Log;
 using JetBrains.Annotations;
-using Lykke.Common.ApiLibrary.Exceptions;
 using Lykke.Common.ExchangeAdapter.Client;
-using Lykke.Common.ExchangeAdapter.Server.Fails;
 using Lykke.Common.ExchangeAdapter.SpotController;
 using Lykke.Common.ExchangeAdapter.SpotController.Records;
 using Lykke.Common.Log;
@@ -166,16 +164,6 @@ namespace Lykke.Service.HedgeBroker.Services.Exchanges
             catch (Exception ex)
             {
                 _log.Error(ex, $"An error occurred during processing '{process}'", context);
-
-                if (ex is OrderNotFoundException
-                    || ex is VolumeTooSmallException
-                    || ex is InvalidOrderPriceException
-                    || ex is InvalidOrderIdException
-                    || ex is InsufficientBalanceException)
-                {
-                    throw new ValidationApiException(ex.Message);
-                }
-
                 throw;
             }
 

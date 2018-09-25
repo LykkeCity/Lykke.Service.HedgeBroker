@@ -41,10 +41,7 @@ namespace Lykke.Service.HedgeBroker
 
                 options.WithMiddleware = builder =>
                 {
-                    builder.UseExceptionHandler(opt =>
-                    {
-                        opt.RegisterExceptionHandler();
-                    });
+                    builder.UseApiExceptionsMiddleware();
                 };
             });
         }

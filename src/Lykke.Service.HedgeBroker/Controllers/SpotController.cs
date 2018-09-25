@@ -12,7 +12,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Lykke.Service.HedgeBroker.Controllers
 {
     [Produces("application/json")]
-    [Route("/api/[controller]")]
+    [Route("[controller]")]
     public class SpotController : Controller, ISpotController
     {
         private readonly IExchangeService _exchangeService;
