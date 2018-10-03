@@ -38,7 +38,7 @@ namespace Lykke.Service.HedgeBroker.Middleware
             }
             catch (ApiException ex)
             {
-                CreateErrorResponse(context, new ErrorResponse(), ex.StatusCode);
+                CreateErrorResponse(context, ex.HasContent ? ex.Content : ex.Message, ex.StatusCode);
             }
             catch (Exception)
             {
@@ -53,17 +53,24 @@ namespace Lykke.Service.HedgeBroker.Middleware
 
         private static void CreateErrorResponse(HttpContext context, ErrorResponse response, HttpStatusCode status)
         {
-            var json = JsonConvert.SerializeObject(new ErrorResponse
-            {
-                ErrorMessage = response?.ErrorMessage ?? "Technical problem",
-                ModelErrors = response?.ModelErrors ?? new Dictionary<string, List<string>>()
-            });
+            var json = JsonConvert.SerializeObject(response);
 
             using (var body = new MemoryStream(Encoding.UTF8.GetBytes(json)))
             {
                 context.Response.Clear();
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)status;
+                body.CopyTo(context.Response.Body);
+            }
+        }
+
+        private static void CreateErrorResponse(HttpContext context, string error, HttpStatusCode status)
+        {
+            using (var body = new MemoryStream(Encoding.UTF8.GetBytes(error)))
+            {
+                context.Response.Clear();
+                context.Response.ContentType = "text/plain";
+                context.Response.StatusCode = (int) status;
                 body.CopyTo(context.Response.Body);
             }
         }
