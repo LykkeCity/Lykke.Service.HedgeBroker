@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Lykke.Service.HedgeBroker.Core.Domain.OrderBooks;
-using Lykke.Service.HedgeBroker.Core.Handlers;
-using Lykke.Service.HedgeBroker.Core.Services;
+using Lykke.Service.HedgeBroker.Domain.Domain.OrderBooks;
+using Lykke.Service.HedgeBroker.Domain.Handlers;
+using Lykke.Service.HedgeBroker.Domain.Services;
 
-namespace Lykke.Service.HedgeBroker.Services.OrderBooks
+namespace Lykke.Service.HedgeBroker.DomainServices.OrderBooks
 {
     [UsedImplicitly]
     public class ExternalOrderBookService : IExternalOrderBookHandler

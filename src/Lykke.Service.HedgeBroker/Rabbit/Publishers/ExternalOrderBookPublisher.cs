@@ -1,11 +1,13 @@
 ﻿using System;
+using AutoMapper;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker.Publisher;
 using Lykke.RabbitMqBroker.Subscriber;
-using Lykke.Service.HedgeBroker.Core.Domain.OrderBooks;
-using Lykke.Service.HedgeBroker.Core.Services;
+using Lykke.Service.HedgeBroker.Domain.Domain.OrderBooks;
+using Lykke.Service.HedgeBroker.Domain.Services;
+using Lykke.Service.HedgeBroker.Rabbit.Messages.ExternalOrderBook;
 using Lykke.Service.HedgeBroker.Settings;
 
 namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
@@ -15,7 +17,7 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
     {
         private readonly ILogFactory _logFactory;
         private readonly RabbitSettings _settings;
-        private RabbitMqPublisher<OrderBook> _publisher;
+        private RabbitMqPublisher<ExternalOrderBook> _publisher;
         private readonly ILog _log;
 
         public ExternalOrderBookPublisher(ILogFactory logFactory, RabbitSettings settings)
@@ -32,7 +34,9 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
 
         public void Publish(OrderBook orderBook)
         {
-            _publisher.ProduceAsync(orderBook);
+            ExternalOrderBook externalOrderBook = Mapper.Map<ExternalOrderBook>(orderBook);
+
+            _publisher.ProduceAsync(externalOrderBook);
         }
 
         public void Start()
@@ -40,8 +44,8 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
             var settings = RabbitMqSubscriptionSettings
                 .CreateForPublisher(_settings.ConnectionString, _settings.Exchange);
 
-            _publisher = new RabbitMqPublisher<OrderBook>(_logFactory, settings)
-                .SetSerializer(new JsonMessageSerializer<OrderBook>())
+            _publisher = new RabbitMqPublisher<ExternalOrderBook>(_logFactory, settings)
+                .SetSerializer(new JsonMessageSerializer<ExternalOrderBook>())
                 .DisableInMemoryQueuePersistence()
                 .Start();
         }

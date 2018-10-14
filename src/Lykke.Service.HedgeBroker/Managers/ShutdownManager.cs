@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Sdk;
-using Lykke.Service.HedgeBroker.Core.Services;
+using Lykke.Service.HedgeBroker.Domain.Services;
 using Lykke.Service.HedgeBroker.Rabbit.Subscribers;
 
 namespace Lykke.Service.HedgeBroker.Managers
@@ -10,15 +10,14 @@ namespace Lykke.Service.HedgeBroker.Managers
     public class ShutdownManager : IShutdownManager
     {
         private readonly ExternalOrderBookSubscriber[] _externalOrderBookSubscribers;
-        private readonly IPublisher[] _publishers;
+        private readonly IExternalOrderBookPublisher _publisher;
 
         public ShutdownManager(
             ExternalOrderBookSubscriber[] externalOrderBookSubscribers,
-            IPublisher[] publishers
-        )
+            IExternalOrderBookPublisher publisher)
         {
             _externalOrderBookSubscribers = externalOrderBookSubscribers;
-            _publishers = publishers;
+            _publisher = publisher;
         }
 
         public Task StopAsync()
@@ -26,10 +25,7 @@ namespace Lykke.Service.HedgeBroker.Managers
             foreach (ExternalOrderBookSubscriber externalOrderBookSubscriber in _externalOrderBookSubscribers)
                 externalOrderBookSubscriber.Stop();
 
-            foreach (IPublisher publisher in _publishers)
-            {
-                publisher.Stop();
-            }
+            _publisher.Stop();
 
             return Task.CompletedTask;
         }

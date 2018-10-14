@@ -5,9 +5,8 @@ using Common.Log;
 using Lykke.Common.ExchangeAdapter.SpotController;
 using Lykke.Common.ExchangeAdapter.SpotController.Records;
 using Lykke.Common.Log;
-using Lykke.Service.HedgeBroker.Core.Services;
+using Lykke.Service.HedgeBroker.Domain.Exchanges;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.HedgeBroker.Controllers
 {
@@ -15,18 +14,17 @@ namespace Lykke.Service.HedgeBroker.Controllers
     [Route("[controller]")]
     public class SpotController : Controller, ISpotController
     {
-        private readonly IExchangeService _exchangeService;
+        private readonly IExternalExchange _exchangeService;
         private readonly ILog _log;
 
         public SpotController(
-            IExchangeService exchangeService,
-            ILogFactory logFctory)
+            IExternalExchange exchangeService,
+            ILogFactory logFactory)
         {
             _exchangeService = exchangeService;
-            _log = logFctory.CreateLog(this);
+            _log = logFactory.CreateLog(this);
         }
 
-        [SwaggerOperation("CancelOrder")]
         [HttpPost("cancelOrder")]
         [ProducesResponseType(typeof(CancelLimitOrderResponse), 200)]
         [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.BadRequest)]
@@ -36,7 +34,6 @@ namespace Lykke.Service.HedgeBroker.Controllers
             return _exchangeService.CancelLimitOrderAsync(request.OrderId);
         }
 
-        [SwaggerOperation("CreateLimitOrder")]
         [HttpPost("createLimitOrder")]
         [ProducesResponseType(typeof(OrderIdResponse), 200)]
         [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.BadRequest)]
@@ -46,7 +43,6 @@ namespace Lykke.Service.HedgeBroker.Controllers
             return _exchangeService.CreateLimitOrderAsync(request);
         }
 
-        [SwaggerOperation("CreateMarketOrder")]
         [HttpPost("createMarketOrder")]
         [ProducesResponseType(typeof(OrderIdResponse), 200)]
         [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.BadRequest)]
@@ -56,7 +52,6 @@ namespace Lykke.Service.HedgeBroker.Controllers
             return _exchangeService.CreateMarketOrderAsync(request);
         }
 
-        [SwaggerOperation("GetLimitOrders")]
         [HttpGet("getLimitOrders")]
         [ProducesResponseType(typeof(GetLimitOrdersResponse), 200)]
         public Task<GetLimitOrdersResponse> GetLimitOrdersAsync()
@@ -64,7 +59,6 @@ namespace Lykke.Service.HedgeBroker.Controllers
             return _exchangeService.GetLimitOrdersAsync();
         }
 
-        [SwaggerOperation("GetOrdersHistory")]
         [HttpGet("getOrdersHistory")]
         [ProducesResponseType(typeof(GetOrdersHistoryResponse), 200)]
         public Task<GetOrdersHistoryResponse> GetOrdersHistoryAsync()
@@ -72,7 +66,6 @@ namespace Lykke.Service.HedgeBroker.Controllers
             return _exchangeService.GetOrdersHistoryAsync();
         }
 
-        [SwaggerOperation("GetWalletBalances")]
         [HttpGet("getWallets")]
         [ProducesResponseType(typeof(GetWalletsResponse), 200)]
         public Task<GetWalletsResponse> GetWalletBalancesAsync()
@@ -80,7 +73,6 @@ namespace Lykke.Service.HedgeBroker.Controllers
             return _exchangeService.GetBalancesAsync();
         }
 
-        [SwaggerOperation("LimitOrderStatus")]
         [HttpGet("limitOrderStatus")]
         [ProducesResponseType(typeof(OrderModel), 200)]
         public Task<OrderModel> LimitOrderStatusAsync(string orderId)
@@ -88,7 +80,6 @@ namespace Lykke.Service.HedgeBroker.Controllers
             return _exchangeService.GetLimitOrderAsync(orderId);
         }
         
-        [SwaggerOperation("MarketOrderStatus")]
         [HttpGet("marketOrderStatus")]
         [ProducesResponseType(typeof(OrderModel), 200)]
         public Task<OrderModel> MarketOrderStatusAsync(string orderId)
@@ -96,7 +87,6 @@ namespace Lykke.Service.HedgeBroker.Controllers
             return _exchangeService.GetMarketOrderAsync(orderId);
         }
         
-        [SwaggerOperation("ReplaceLimitOrder")]
         [HttpPost("replaceLimitOrder")]
         [ProducesResponseType(typeof(OrderIdResponse), 200)]
         [ProducesResponseType(typeof(QueueResultModel.ErrorModel), (int)HttpStatusCode.BadRequest)]

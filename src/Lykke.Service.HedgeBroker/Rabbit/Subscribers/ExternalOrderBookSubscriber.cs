@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
-using Lykke.Service.HedgeBroker.Core.Consts;
-using Lykke.Service.HedgeBroker.Core.Domain.OrderBooks;
-using Lykke.Service.HedgeBroker.Core.Handlers;
+using Lykke.Service.HedgeBroker.Domain.Consts;
+using Lykke.Service.HedgeBroker.Domain.Domain.OrderBooks;
+using Lykke.Service.HedgeBroker.Domain.Handlers;
 using Lykke.Service.HedgeBroker.Rabbit.Messages.ExternalOrderBook;
 using Lykke.Service.HedgeBroker.Settings.Exchanges;
 
@@ -87,26 +88,9 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
                     return;
                 }
 
-                var externalOrderBook = new OrderBook
-                {
-                    Exchange = _exchangeName,
-                    Timestamp = message.Timestamp,
-                    AssetPairId = message.AssetPairId,
-                    SellLimitOrders = message.SellLimitOrders.GroupBy(e => e.Price)
-                        .Select(e => new OrderBookLimitOrder
-                        {
-                            Price = e.Key,
-                            Volume = e.Sum(i => i.Volume)
-                        }).ToList(),
-                    BuyLimitOrders = message.BuyLimitOrders.GroupBy(e => e.Price)
-                        .Select(e => new OrderBookLimitOrder
-                        {
-                            Price = e.Key,
-                            Volume = e.Sum(i => i.Volume)
-                        }).ToList()
-                };
+                OrderBook orderBook = Mapper.Map<OrderBook>(message);
 
-                await Task.WhenAll(_externalOrderBookHandlers.Select(o => o.HandleAsync(externalOrderBook)));
+                await Task.WhenAll(_externalOrderBookHandlers.Select(o => o.HandleAsync(orderBook)));
             }
             catch (Exception exception)
             {

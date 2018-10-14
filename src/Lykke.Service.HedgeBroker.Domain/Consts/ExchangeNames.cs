@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.HedgeBroker.Core.Consts
+﻿namespace Lykke.Service.HedgeBroker.Domain.Consts
 {
     public class ExchangeNames
     {

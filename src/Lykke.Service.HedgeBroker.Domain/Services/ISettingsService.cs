@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Lykke.Service.HedgeBroker.Core.Settings;
+using Lykke.Service.HedgeBroker.Domain.Settings;
 
-namespace Lykke.Service.HedgeBroker.Core.Services
+namespace Lykke.Service.HedgeBroker.Domain.Services
 {
     public interface ISettingsService
     {
