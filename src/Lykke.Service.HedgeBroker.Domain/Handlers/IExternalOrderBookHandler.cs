@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Lykke.Service.HedgeBroker.Core.Domain.OrderBooks;
+using Lykke.Service.HedgeBroker.Domain.Domain.OrderBooks;
 
-namespace Lykke.Service.HedgeBroker.Core.Handlers
+namespace Lykke.Service.HedgeBroker.Domain.Handlers
 {
     public interface IExternalOrderBookHandler
     {

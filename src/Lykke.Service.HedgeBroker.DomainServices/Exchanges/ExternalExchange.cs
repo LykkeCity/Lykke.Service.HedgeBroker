@@ -9,44 +9,46 @@ using Lykke.Common.ExchangeAdapter.Client;
 using Lykke.Common.ExchangeAdapter.SpotController;
 using Lykke.Common.ExchangeAdapter.SpotController.Records;
 using Lykke.Common.Log;
-using Lykke.Service.HedgeBroker.Core.Exchanges;
-using Lykke.Service.HedgeBroker.Core.Services;
-using Lykke.Service.HedgeBroker.Core.Settings;
+using Lykke.Service.HedgeBroker.Domain.Exchanges;
+using Lykke.Service.HedgeBroker.Domain.Services;
+using Lykke.Service.HedgeBroker.Domain.Settings;
 
-namespace Lykke.Service.HedgeBroker.Services.Exchanges
+namespace Lykke.Service.HedgeBroker.DomainServices.Exchanges
 {
     [UsedImplicitly]
     public class ExternalExchange : IExternalExchange
     {
         private readonly ExchangeAdapterClientFactory _exchangeAdapterClientFactory;
         private readonly ISettingsService _settingsService;
+        private readonly string _exchangeName;
         private readonly ILog _log;
 
         public ExternalExchange(
             ExchangeAdapterClientFactory exchangeAdapterClientFactory,
             ISettingsService settingsService,
+            string exchangeName,
             ILogFactory logFactory)
         {
             _exchangeAdapterClientFactory = exchangeAdapterClientFactory;
             _settingsService = settingsService;
+            _exchangeName = exchangeName;
             _log = logFactory.CreateLog(this);
         }
 
-        public Task<OrderIdResponse> CreateLimitOrderAsync(string exchange, LimitOrderRequest limitOrderRequest)
+        public Task<OrderIdResponse> CreateLimitOrderAsync(LimitOrderRequest limitOrderRequest)
         {
             return ExecuteAsync(
                 spotController => spotController.CreateLimitOrderAsync(limitOrderRequest),
                 "External exchange create limit order",
-                exchange,
                 new
                 {
                     request = $"data: {limitOrderRequest.ToJson()}",
                     originalVolume = limitOrderRequest.Volume,
-                    exchange
+                    _exchangeName
                 });
         }
 
-        public Task<CancelLimitOrderResponse> CancelLimitOrderAsync(string exchange, string limitOrderId)
+        public Task<CancelLimitOrderResponse> CancelLimitOrderAsync(string limitOrderId)
         {
             var cancelLimitOrderRequest = new CancelLimitOrderRequest
             {
@@ -56,100 +58,93 @@ namespace Lykke.Service.HedgeBroker.Services.Exchanges
             return ExecuteAsync(
                 spotController => spotController.CancelLimitOrderAsync(cancelLimitOrderRequest),
                 "External exchange cancel limit order",
-                exchange,
                 cancelLimitOrderRequest);
         }
 
-        public Task<OrderModel> GetLimitOrderAsync(string exchange, string limitOrderId)
+        public Task<OrderModel> GetLimitOrderAsync(string limitOrderId)
         {
             return ExecuteAsync(
                 spotController => spotController.LimitOrderStatusAsync(limitOrderId),
                 "External exchange get limit order status",
-                exchange,
                 new
                 {
                     limitOrderId,
-                    exchange
+                    _exchangeName
                 });
         }
 
-        public Task<GetLimitOrdersResponse> GetLimitOrdersAsync(string exchange)
+        public Task<GetLimitOrdersResponse> GetLimitOrdersAsync()
         {
             return ExecuteAsync(
                 spotController => spotController.GetLimitOrdersAsync(),
                 "External exchange get limit orders",
-                exchange,
                 new
                 {
-                    exchange
+                    _exchangeName
                 });
         }
 
-        public Task<GetWalletsResponse> GetBalancesAsync(string exchange)
+        public Task<GetWalletsResponse> GetBalancesAsync()
         {
             return ExecuteAsync(
                 spotController => spotController.GetWalletBalancesAsync(),
                 "External exchange get balances",
-                exchange,
                 new
                 {
-                    exchange
+                    _exchangeName
                 });
         }
 
-        public Task<OrderIdResponse> CreateMarketOrderAsync(string exchange, MarketOrderRequest request)
+        public Task<OrderIdResponse> CreateMarketOrderAsync(MarketOrderRequest request)
         {
             return ExecuteAsync(
                 spotController => spotController.CreateMarketOrderAsync(request),
                 "External exchange create market order",
-                exchange,
                 request);
         }
 
-        public Task<OrderModel> GetMarketOrderAsync(string exchange, string orderId)
+        public Task<OrderModel> GetMarketOrderAsync(string orderId)
         {
             return ExecuteAsync(
                 spotController => spotController.MarketOrderStatusAsync(orderId),
                 "External exchange get market order status",
-                exchange,
                 new
                 {
-                    orderId
+                    orderId,
+                    _exchangeName
                 }
             );
         }
 
-        public Task<GetOrdersHistoryResponse> GetOrdersHistoryAsync(string exchange)
+        public Task<GetOrdersHistoryResponse> GetOrdersHistoryAsync()
         {
             return ExecuteAsync(
                 spotController => spotController.GetOrdersHistoryAsync(),
                 "External exchange get orders history",
-                exchange,
                 new
                 {
-                    exchange
+                    _exchangeName
                 });
         }
 
-        public Task<OrderIdResponse> ReplaceLimitOrderAsync(string exchange, ReplaceLimitOrderRequest request)
+        public Task<OrderIdResponse> ReplaceLimitOrderAsync(ReplaceLimitOrderRequest request)
         {
             return ExecuteAsync(
                 spotController => spotController.ReplaceLimitOrderAsync(request),
                 "External exchange replace limit order",
-                exchange,
                 request);
         }
 
-        private async Task<decimal> GetFeeAsync(string exchange)
+        private async Task<decimal> GetFeeAsync()
         {
             IReadOnlyList<ExternalExchangeSettings> externalExchangeSettings =
                 await _settingsService.GetExternalExchangesAsync();
 
-            return externalExchangeSettings.FirstOrDefault(o => o.Name == exchange)?.Fee ?? decimal.Zero;
+            return externalExchangeSettings.FirstOrDefault(o => o.Name == _exchangeName)?.Fee ?? decimal.Zero;
         }
         
         private async Task<TResponse> ExecuteAsync<TResponse>(Func<ISpotController, Task<TResponse>> action,
-            string process, string exchange, object context)
+            string process, object context)
         {
             _log.Info($"{process} request", context);
 
@@ -157,7 +152,7 @@ namespace Lykke.Service.HedgeBroker.Services.Exchanges
 
             try
             {
-                ISpotController spotController = _exchangeAdapterClientFactory.GetSpotController(exchange);
+                ISpotController spotController = _exchangeAdapterClientFactory.GetSpotController(_exchangeName);
 
                 response = await action(spotController);
             }
@@ -170,7 +165,7 @@ namespace Lykke.Service.HedgeBroker.Services.Exchanges
             _log.Info($"{process} response", new
             {
                 responce = $"data: {response.ToJson()}",
-                exchange
+                _exchangeName
             });
 
             return response;

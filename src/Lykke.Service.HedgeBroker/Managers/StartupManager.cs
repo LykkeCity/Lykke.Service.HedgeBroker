@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Sdk;
-using Lykke.Service.HedgeBroker.Core.Services;
+using Lykke.Service.HedgeBroker.Domain.Services;
 using Lykke.Service.HedgeBroker.Rabbit.Subscribers;
 
 namespace Lykke.Service.HedgeBroker.Managers
@@ -10,25 +10,22 @@ namespace Lykke.Service.HedgeBroker.Managers
     public class StartupManager : IStartupManager
     {
         private readonly ExternalOrderBookSubscriber[] _externalOrderBookSubscribers;
-        private readonly IPublisher[] _publishers;
+        private readonly IExternalOrderBookPublisher _publisher;
 
         public StartupManager(
             ExternalOrderBookSubscriber[] externalOrderBookSubscribers,
-            IPublisher[] publishers)
+            IExternalOrderBookPublisher publisher)
         {
             _externalOrderBookSubscribers = externalOrderBookSubscribers;
-            _publishers = publishers;
+            _publisher = publisher;
         }
 
         public Task StartAsync()
         {
+            _publisher.Start();
+
             foreach (ExternalOrderBookSubscriber externalOrderBookSubscriber in _externalOrderBookSubscribers)
                 externalOrderBookSubscriber.Start();
-
-            foreach (IPublisher publisher in _publishers)
-            {
-                publisher.Start();
-            }
 
             return Task.CompletedTask;
         }

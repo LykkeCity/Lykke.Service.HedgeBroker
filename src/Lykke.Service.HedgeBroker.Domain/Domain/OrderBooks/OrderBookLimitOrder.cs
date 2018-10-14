@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.HedgeBroker.Core.Domain.OrderBooks
+﻿namespace Lykke.Service.HedgeBroker.Domain.Domain.OrderBooks
 {
     public class OrderBookLimitOrder
     {

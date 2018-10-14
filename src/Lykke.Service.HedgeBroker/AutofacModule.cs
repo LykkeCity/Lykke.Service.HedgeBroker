@@ -5,8 +5,8 @@ using Autofac;
 using JetBrains.Annotations;
 using Lykke.Common.ExchangeAdapter.Client;
 using Lykke.Sdk;
-using Lykke.Service.HedgeBroker.Core.Consts;
-using Lykke.Service.HedgeBroker.Core.Services;
+using Lykke.Service.HedgeBroker.Domain.Consts;
+using Lykke.Service.HedgeBroker.Domain.Services;
 using Lykke.Service.HedgeBroker.Managers;
 using Lykke.Service.HedgeBroker.Rabbit.Publishers;
 using Lykke.Service.HedgeBroker.Rabbit.Subscribers;
@@ -29,11 +29,11 @@ namespace Lykke.Service.HedgeBroker
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterModule(new Services.AutofacModule(
+            builder.RegisterModule(new DomainServices.AutofacModule(
                 _settings.CurrentValue.HedgeBrokerService.Exchange,
                 _settings.CurrentValue.HedgeBrokerService.Exchanges.External
                     .Where(o => o.Name != ExchangeNames.Lykke)
-                    .Select(o => new Core.Settings.ExternalExchangeSettings
+                    .Select(o => new Domain.Settings.ExternalExchangeSettings
                     {
                         Name = o.Name,
                         Fee = o.Fee
@@ -77,7 +77,6 @@ namespace Lykke.Service.HedgeBroker
 
             builder.RegisterType<ExternalOrderBookPublisher>()
                 .As<IExternalOrderBookPublisher>()
-                .As<IPublisher>()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Rabbit))
                 .SingleInstance();
         }

@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using Autofac;
 using JetBrains.Annotations;
-using Lykke.Service.HedgeBroker.Core.Exchanges;
-using Lykke.Service.HedgeBroker.Core.Handlers;
-using Lykke.Service.HedgeBroker.Core.Services;
-using Lykke.Service.HedgeBroker.Core.Settings;
-using Lykke.Service.HedgeBroker.Services.Exchanges;
-using Lykke.Service.HedgeBroker.Services.OrderBooks;
+using Lykke.Service.HedgeBroker.Domain.Exchanges;
+using Lykke.Service.HedgeBroker.Domain.Handlers;
+using Lykke.Service.HedgeBroker.Domain.Services;
+using Lykke.Service.HedgeBroker.Domain.Settings;
+using Lykke.Service.HedgeBroker.DomainServices.Exchanges;
+using Lykke.Service.HedgeBroker.DomainServices.OrderBooks;
 
-namespace Lykke.Service.HedgeBroker.Services
+namespace Lykke.Service.HedgeBroker.DomainServices
 {
     [UsedImplicitly]
     public class AutofacModule : Module
@@ -35,16 +35,12 @@ namespace Lykke.Service.HedgeBroker.Services
         {
             builder.RegisterType<ExternalExchange>()
                 .As<IExternalExchange>()
+                .WithParameter(TypedParameter.From(_exchangeName))
                 .SingleInstance();
         }
 
         private void RegisterServices(ContainerBuilder builder)
         {
-            builder.RegisterType<ExchangeService>()
-                .As<IExchangeService>()
-                .WithParameter(TypedParameter.From(_exchangeName))
-                .SingleInstance();
-
             builder.RegisterType<SettingsService>()
                 .As<ISettingsService>()
                 .WithParameter(TypedParameter.From(_externalExchangeSettings))

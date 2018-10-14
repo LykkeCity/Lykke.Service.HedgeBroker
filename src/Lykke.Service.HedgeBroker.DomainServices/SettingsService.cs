@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Lykke.Service.HedgeBroker.Core.Services;
-using Lykke.Service.HedgeBroker.Core.Settings;
+using Lykke.Service.HedgeBroker.Domain.Services;
+using Lykke.Service.HedgeBroker.Domain.Settings;
 
-namespace Lykke.Service.HedgeBroker.Services
+namespace Lykke.Service.HedgeBroker.DomainServices
 {
     [UsedImplicitly]
     public class SettingsService : ISettingsService
