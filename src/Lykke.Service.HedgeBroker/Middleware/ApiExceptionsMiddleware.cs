@@ -3,12 +3,8 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Lykke.Common.Api.Contract.Responses;
-using Lykke.Common.ApiLibrary.Exceptions;
-using Lykke.Common.ExchangeAdapter.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using Refit;
 
 namespace Lykke.Service.HedgeBroker.Middleware
@@ -24,48 +20,17 @@ namespace Lykke.Service.HedgeBroker.Middleware
         {
             try
             {
-                // First handle business exceptions
-                await HandleBusinessExceptionsMiddleware.SetStatusOnBusinessError(context, next);
-            }
-            catch (ValidationApiException ex)
-            {
-                CreateErrorResponse(context, ex.ErrorResponse, ex.StatusCode);
-            }
-            catch (ClientApiException ex)
-            {
-                CreateErrorResponse(context, ex.ErrorResponse, ex.HttpStatusCode);
+                await next();
             }
             catch (ApiException ex)
             {
                 CreateErrorResponse(context, ex.HasContent ? ex.Content : ex.Message, ex.StatusCode);
             }
-            catch (Exception)
-            {
-                CreateErrorResponse(context,
-                    new ErrorResponse
-                    {
-                        ErrorMessage = "Technical problem"
-                    },
-                    HttpStatusCode.InternalServerError);
-            }
         }
 
-        private static void CreateErrorResponse(HttpContext context, ErrorResponse response, HttpStatusCode status)
+        private static void CreateErrorResponse(HttpContext context, string content, HttpStatusCode status)
         {
-            var json = JsonConvert.SerializeObject(response);
-
-            using (var body = new MemoryStream(Encoding.UTF8.GetBytes(json)))
-            {
-                context.Response.Clear();
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (int)status;
-                body.CopyTo(context.Response.Body);
-            }
-        }
-
-        private static void CreateErrorResponse(HttpContext context, string error, HttpStatusCode status)
-        {
-            using (var body = new MemoryStream(Encoding.UTF8.GetBytes(error)))
+            using (var body = new MemoryStream(Encoding.UTF8.GetBytes(content)))
             {
                 context.Response.Clear();
                 context.Response.ContentType = "text/plain";

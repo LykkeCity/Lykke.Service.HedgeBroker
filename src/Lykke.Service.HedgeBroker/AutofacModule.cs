@@ -6,7 +6,9 @@ using JetBrains.Annotations;
 using Lykke.Common.ExchangeAdapter.Client;
 using Lykke.Sdk;
 using Lykke.Service.HedgeBroker.Domain.Consts;
-using Lykke.Service.HedgeBroker.Domain.Services;
+using Lykke.Service.HedgeBroker.Domain.Exchanges;
+using Lykke.Service.HedgeBroker.Exchanges;
+using Lykke.Service.HedgeBroker.Handlers;
 using Lykke.Service.HedgeBroker.Managers;
 using Lykke.Service.HedgeBroker.Rabbit.Publishers;
 using Lykke.Service.HedgeBroker.Rabbit.Subscribers;
@@ -46,7 +48,13 @@ namespace Lykke.Service.HedgeBroker
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
 
+            builder.RegisterType<ExternalOrderBookHandler>()
+                .AsSelf()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Exchange))
+                .SingleInstance();
+
             RegisterExchangeAdapters(builder);
+            RegisterExchanges(builder);
             RegisterRabbit(builder);
         }
 
@@ -59,6 +67,14 @@ namespace Lykke.Service.HedgeBroker
                     v => new Common.ExchangeAdapter.Client.AdapterEndpoint(v.Adapter.ApiKey, new Uri(v.Adapter.Url)));
 
             builder.RegisterInstance(new ExchangeAdapterClientFactory(endpoints));
+        }
+
+        private void RegisterExchanges(ContainerBuilder builder)
+        {
+            builder.RegisterType<ExternalExchange>()
+                .As<IExternalExchange>()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Exchange))
+                .SingleInstance();
         }
 
         private void RegisterRabbit(ContainerBuilder builder)
@@ -76,7 +92,7 @@ namespace Lykke.Service.HedgeBroker
             }
 
             builder.RegisterType<ExternalOrderBookPublisher>()
-                .As<IExternalOrderBookPublisher>()
+                .AsSelf()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Rabbit))
                 .SingleInstance();
         }
