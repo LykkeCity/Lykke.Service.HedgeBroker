@@ -7,14 +7,14 @@ using Lykke.Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.HedgeBroker.Handlers;
-using Lykke.Service.HedgeBroker.Settings.Exchanges;
+using Lykke.Service.HedgeBroker.Settings.ServiceSettings.Rabbit;
 
 namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
 {
     [UsedImplicitly]
     public class ExternalOrderBookSubscriber : IDisposable
     {
-        private readonly ExchangeSettings _settings;
+        private readonly SubscriberSettings _settings;
         private readonly ExternalOrderBookHandler _externalOrderBookHandler;
         private readonly string _exchangeName;
         private readonly ILogFactory _logFactory;
@@ -23,7 +23,7 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
         private RabbitMqSubscriber<OrderBook> _subscriber;
 
         public ExternalOrderBookSubscriber(
-            ExchangeSettings settings,
+            SubscriberSettings settings,
             ExternalOrderBookHandler externalOrderBookHandler,
             string exchangeName,
             ILogFactory logFactory)

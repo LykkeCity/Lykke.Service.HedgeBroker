@@ -13,8 +13,7 @@ using Lykke.Service.HedgeBroker.Managers;
 using Lykke.Service.HedgeBroker.Rabbit.Publishers;
 using Lykke.Service.HedgeBroker.Rabbit.Subscribers;
 using Lykke.Service.HedgeBroker.Settings;
-using Lykke.Service.HedgeBroker.Settings.Exchanges;
-using Lykke.Service.HedgeBroker.Settings.Exchanges.External;
+using Lykke.Service.HedgeBroker.Settings.ServiceSettings.Adapters;
 using Lykke.SettingsReader;
 
 namespace Lykke.Service.HedgeBroker
@@ -32,10 +31,9 @@ namespace Lykke.Service.HedgeBroker
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterModule(new DomainServices.AutofacModule(
-                _settings.CurrentValue.HedgeBrokerService.Exchange,
-                _settings.CurrentValue.HedgeBrokerService.Exchanges.External
+                _settings.CurrentValue.HedgeBrokerService.Exchanges
                     .Where(o => o.Name != ExchangeNames.Lykke)
-                    .Select(o => new Domain.Settings.ExternalExchangeSettings
+                    .Select(o => new Domain.ExternalExchangeSettings
                     {
                         Name = o.Name,
                         Fee = o.Fee
@@ -60,11 +58,11 @@ namespace Lykke.Service.HedgeBroker
 
         private void RegisterExchangeAdapters(ContainerBuilder builder)
         {
-            ExchangesSettings exchangesSettings = _settings.CurrentValue.HedgeBrokerService.Exchanges;
-
             IReadOnlyDictionary<string, Common.ExchangeAdapter.Client.AdapterEndpoint> endpoints =
-                exchangesSettings.External.Where(e => e.Adapter != null).ToDictionary(o => o.Name,
-                    v => new Common.ExchangeAdapter.Client.AdapterEndpoint(v.Adapter.ApiKey, new Uri(v.Adapter.Url)));
+                _settings.CurrentValue.HedgeBrokerService.Exchanges
+                    .Where(e => e.Adapter != null).ToDictionary(o => o.Name,
+                        v => new Common.ExchangeAdapter.Client.AdapterEndpoint(v.Adapter.ApiKey,
+                            new Uri(v.Adapter.Url)));
 
             builder.RegisterInstance(new ExchangeAdapterClientFactory(endpoints));
         }
@@ -79,9 +77,8 @@ namespace Lykke.Service.HedgeBroker
 
         private void RegisterRabbit(ContainerBuilder builder)
         {
-            ExchangesSettings exchangesSettings = _settings.CurrentValue.HedgeBrokerService.Exchanges;
-
-            foreach (ExternalExchangeSettings externalExchangeSettings in exchangesSettings.External)
+            foreach (ExternalExchangeSettings externalExchangeSettings in _settings.CurrentValue.HedgeBrokerService
+                .Exchanges)
             {
                 builder.RegisterType<ExternalOrderBookSubscriber>()
                     .AsSelf()

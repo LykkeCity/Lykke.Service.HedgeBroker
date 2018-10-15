@@ -1,8 +1,10 @@
 ﻿using Lykke.Sdk;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace Lykke.Service.HedgeBroker
 {
+    [UsedImplicitly]
     internal sealed class Program
     {
         public static async Task Main(string[] args)

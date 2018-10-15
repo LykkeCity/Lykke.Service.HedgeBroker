@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.HedgeBroker.Domain.Settings
+﻿namespace Lykke.Service.HedgeBroker.Domain
 {
     public class ExternalExchangeSettings
     {

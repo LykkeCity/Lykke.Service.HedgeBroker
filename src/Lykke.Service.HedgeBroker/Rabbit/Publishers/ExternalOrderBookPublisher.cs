@@ -4,7 +4,7 @@ using Lykke.Common.ExchangeAdapter.Contracts;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker.Publisher;
 using Lykke.RabbitMqBroker.Subscriber;
-using Lykke.Service.HedgeBroker.Settings;
+using Lykke.Service.HedgeBroker.Settings.ServiceSettings.Rabbit;
 
 namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
 {
@@ -12,10 +12,10 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
     public class ExternalOrderBookPublisher : IDisposable
     {
         private readonly ILogFactory _logFactory;
-        private readonly RabbitSettings _settings;
+        private readonly PublisherSettings _settings;
         private RabbitMqPublisher<OrderBook> _publisher;
 
-        public ExternalOrderBookPublisher(ILogFactory logFactory, RabbitSettings settings)
+        public ExternalOrderBookPublisher(ILogFactory logFactory, PublisherSettings settings)
         {
             _logFactory = logFactory;
             _settings = settings;

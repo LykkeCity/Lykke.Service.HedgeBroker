@@ -7,7 +7,4 @@
     <PackageReference Include="Lykke.Common" Version="7.1.0" />
     <PackageReference Include="Lykke.Common.ExchangeAdapter" Version="3.7.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Repositories\" />
-  </ItemGroup>
 </Project>

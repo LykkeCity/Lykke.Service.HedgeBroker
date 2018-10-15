@@ -1,35 +1,33 @@
 HedgeBrokerService:
-    Db:
-        LogsConnectionString:
-            settings-key: HedgeBrokerService-LogsConnectionString
-            types:
-              - AzureTableStorage
-    Rabbit:
-      ConnectionString:
-        settings-key: HedgeBrokerService-Rabbit-ConnectionString
-        types:
-          - RabbitMq
-      Exchange:
-        settings-key: HedgeBrokerService-Rabbit-Exchange
-
-    Exchanges:
-        External:
-            settings-key: HedgeBrokerService-Exchanges-External
-            types:
-                - JsonArray
-
+  Db:
+    LogsConnectionString:
+      settings-key: HedgeBrokerService-LogsConnectionString
+      types:
+      - AzureTableStorage
+  Rabbit:
+    ConnectionString:
+      settings-key: HedgeBrokerService-Rabbit-ConnectionString
+      types:
+      - RabbitMq
     Exchange:
-        settings-key: HedgeBrokerService-Proxy-Exchange
+      settings-key: HedgeBrokerService-Rabbit-Exchange
+
+  Exchanges:
+    settings-key: HedgeBrokerService-Exchanges-External
+    types:
+    - JsonArray
+
+  Exchange:
+    settings-key: HedgeBrokerService-Proxy-Exchange
 
 SlackNotifications:
-    AzureQueue:
-        ConnectionString:
-            settings-key: SlackNotificationsConnString
-            types:
-                - AzureTableStorage
-        QueueName:
-            settings-key: SlackQueueName
+  AzureQueue:
+    ConnectionString:
+      settings-key: SlackNotificationsConnString
+      types:
+      - AzureTableStorage
+    QueueName:
+      settings-key: SlackQueueName
 MonitoringServiceClient:
-    MonitoringServiceUrl:
-        settings-key: MonitoringServiceUrl
-
+  MonitoringServiceUrl:
+    settings-key: MonitoringServiceUrl
