@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Common.ExchangeAdapter.Contracts;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
-using Lykke.Service.HedgeBroker.Domain.Consts;
-using Lykke.Service.HedgeBroker.Domain.Domain.OrderBooks;
-using Lykke.Service.HedgeBroker.Domain.Handlers;
-using Lykke.Service.HedgeBroker.Rabbit.Messages.ExternalOrderBook;
+using Lykke.Service.HedgeBroker.Handlers;
 using Lykke.Service.HedgeBroker.Settings.Exchanges;
 
 namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
@@ -19,21 +15,21 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
     public class ExternalOrderBookSubscriber : IDisposable
     {
         private readonly ExchangeSettings _settings;
-        private readonly IExternalOrderBookHandler[] _externalOrderBookHandlers;
+        private readonly ExternalOrderBookHandler _externalOrderBookHandler;
         private readonly string _exchangeName;
         private readonly ILogFactory _logFactory;
         private readonly ILog _log;
 
-        private RabbitMqSubscriber<ExternalOrderBook> _subscriber;
+        private RabbitMqSubscriber<OrderBook> _subscriber;
 
         public ExternalOrderBookSubscriber(
             ExchangeSettings settings,
-            IExternalOrderBookHandler[] externalOrderBookHandlers,
+            ExternalOrderBookHandler externalOrderBookHandler,
             string exchangeName,
             ILogFactory logFactory)
         {
             _settings = settings;
-            _externalOrderBookHandlers = externalOrderBookHandlers;
+            _externalOrderBookHandler = externalOrderBookHandler;
             _exchangeName = exchangeName;
             _logFactory = logFactory;
             _log = logFactory.CreateLog(this);
@@ -41,26 +37,15 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
 
         public void Start()
         {
-            if (_exchangeName.Equals(ExchangeNames.Lykke, StringComparison.CurrentCultureIgnoreCase))
-            {
-                _log.Warning("Lykke exchange skipped", context: new
-                {
-                    Name = _exchangeName,
-                    _settings.Exchange,
-                    _settings.QueueSuffix
-                });
-                return;
-            }
-
             var settings = RabbitMqSubscriptionSettings
                 .CreateForSubscriber(_settings.ConnectionString, _settings.Exchange, _settings.QueueSuffix);
 
             settings.DeadLetterExchangeName = null;
             settings.IsDurable = false;
 
-            _subscriber = new RabbitMqSubscriber<ExternalOrderBook>(_logFactory, settings,
+            _subscriber = new RabbitMqSubscriber<OrderBook>(_logFactory, settings,
                     new ResilientErrorHandlingStrategy(_logFactory, settings, TimeSpan.FromSeconds(10)))
-                .SetMessageDeserializer(new JsonMessageDeserializer<ExternalOrderBook>())
+                .SetMessageDeserializer(new JsonMessageDeserializer<OrderBook>())
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(ProcessMessageAsync)
                 .CreateDefaultBinding()
@@ -77,20 +62,11 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
             _subscriber?.Dispose();
         }
 
-        private async Task ProcessMessageAsync(ExternalOrderBook message)
+        private async Task ProcessMessageAsync(OrderBook message)
         {
             try
             {
-                if (message.SellLimitOrders.Any() && message.BuyLimitOrders.Any() &&
-                    message.SellLimitOrders.Min(e => e.Price) <= message.BuyLimitOrders.Max(e => e.Price))
-                {
-                    _log.Info("Skipped order book with negative spread", message);
-                    return;
-                }
-
-                OrderBook orderBook = Mapper.Map<OrderBook>(message);
-
-                await Task.WhenAll(_externalOrderBookHandlers.Select(o => o.HandleAsync(orderBook)));
+                await _externalOrderBookHandler.HandleAsync(message);
             }
             catch (Exception exception)
             {

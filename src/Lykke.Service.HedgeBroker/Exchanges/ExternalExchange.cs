@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
@@ -10,27 +8,22 @@ using Lykke.Common.ExchangeAdapter.SpotController;
 using Lykke.Common.ExchangeAdapter.SpotController.Records;
 using Lykke.Common.Log;
 using Lykke.Service.HedgeBroker.Domain.Exchanges;
-using Lykke.Service.HedgeBroker.Domain.Services;
-using Lykke.Service.HedgeBroker.Domain.Settings;
 
-namespace Lykke.Service.HedgeBroker.DomainServices.Exchanges
+namespace Lykke.Service.HedgeBroker.Exchanges
 {
     [UsedImplicitly]
     public class ExternalExchange : IExternalExchange
     {
         private readonly ExchangeAdapterClientFactory _exchangeAdapterClientFactory;
-        private readonly ISettingsService _settingsService;
         private readonly string _exchangeName;
         private readonly ILog _log;
 
         public ExternalExchange(
             ExchangeAdapterClientFactory exchangeAdapterClientFactory,
-            ISettingsService settingsService,
             string exchangeName,
             ILogFactory logFactory)
         {
             _exchangeAdapterClientFactory = exchangeAdapterClientFactory;
-            _settingsService = settingsService;
             _exchangeName = exchangeName;
             _log = logFactory.CreateLog(this);
         }
@@ -134,14 +127,6 @@ namespace Lykke.Service.HedgeBroker.DomainServices.Exchanges
                 "External exchange replace limit order",
                 request);
         }
-
-        private async Task<decimal> GetFeeAsync()
-        {
-            IReadOnlyList<ExternalExchangeSettings> externalExchangeSettings =
-                await _settingsService.GetExternalExchangesAsync();
-
-            return externalExchangeSettings.FirstOrDefault(o => o.Name == _exchangeName)?.Fee ?? decimal.Zero;
-        }
         
         private async Task<TResponse> ExecuteAsync<TResponse>(Func<ISpotController, Task<TResponse>> action,
             string process, object context)
@@ -170,6 +155,5 @@ namespace Lykke.Service.HedgeBroker.DomainServices.Exchanges
 
             return response;
         }
-
     }
 }

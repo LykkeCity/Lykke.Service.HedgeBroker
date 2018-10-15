@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Sdk;
-using Lykke.Service.HedgeBroker.Domain.Services;
+using Lykke.Service.HedgeBroker.Rabbit.Publishers;
 using Lykke.Service.HedgeBroker.Rabbit.Subscribers;
 
 namespace Lykke.Service.HedgeBroker.Managers
@@ -10,11 +10,11 @@ namespace Lykke.Service.HedgeBroker.Managers
     public class ShutdownManager : IShutdownManager
     {
         private readonly ExternalOrderBookSubscriber[] _externalOrderBookSubscribers;
-        private readonly IExternalOrderBookPublisher _publisher;
+        private readonly ExternalOrderBookPublisher _publisher;
 
         public ShutdownManager(
             ExternalOrderBookSubscriber[] externalOrderBookSubscribers,
-            IExternalOrderBookPublisher publisher)
+            ExternalOrderBookPublisher publisher)
         {
             _externalOrderBookSubscribers = externalOrderBookSubscribers;
             _publisher = publisher;

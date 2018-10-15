@@ -1,12 +1,8 @@
 ﻿using System.Collections.Generic;
 using Autofac;
 using JetBrains.Annotations;
-using Lykke.Service.HedgeBroker.Domain.Exchanges;
-using Lykke.Service.HedgeBroker.Domain.Handlers;
 using Lykke.Service.HedgeBroker.Domain.Services;
 using Lykke.Service.HedgeBroker.Domain.Settings;
-using Lykke.Service.HedgeBroker.DomainServices.Exchanges;
-using Lykke.Service.HedgeBroker.DomainServices.OrderBooks;
 
 namespace Lykke.Service.HedgeBroker.DomainServices
 {
@@ -26,17 +22,7 @@ namespace Lykke.Service.HedgeBroker.DomainServices
 
         protected override void Load(ContainerBuilder builder)
         {
-            RegisterExchanges(builder);
-            RegisterOrderBooks(builder);
             RegisterServices(builder);
-        }
-
-        private void RegisterExchanges(ContainerBuilder builder)
-        {
-            builder.RegisterType<ExternalExchange>()
-                .As<IExternalExchange>()
-                .WithParameter(TypedParameter.From(_exchangeName))
-                .SingleInstance();
         }
 
         private void RegisterServices(ContainerBuilder builder)
@@ -44,14 +30,6 @@ namespace Lykke.Service.HedgeBroker.DomainServices
             builder.RegisterType<SettingsService>()
                 .As<ISettingsService>()
                 .WithParameter(TypedParameter.From(_externalExchangeSettings))
-                .SingleInstance();
-        }
-
-        private void RegisterOrderBooks(ContainerBuilder builder)
-        {
-            builder.RegisterType<ExternalOrderBookService>()
-                .As<IExternalOrderBookHandler>()
-                .WithParameter(TypedParameter.From(_exchangeName))
                 .SingleInstance();
         }
     }

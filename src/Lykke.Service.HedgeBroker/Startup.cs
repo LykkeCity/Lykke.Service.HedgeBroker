@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using AutoMapper;
+using Lykke.Common.ExchangeAdapter.Server;
 using Lykke.Service.HedgeBroker.Middleware;
 
 namespace Lykke.Service.HedgeBroker
@@ -23,13 +24,6 @@ namespace Lykke.Service.HedgeBroker
         {
             return services.BuildServiceProvider<AppSettings>(options =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.AddProfiles(typeof(AutoMapperProfile));
-                });
-
-                Mapper.AssertConfigurationIsValid();
-
                 options.SwaggerOptions = _swaggerOptions;
                 
                 options.Logs = logs =>
@@ -49,6 +43,7 @@ namespace Lykke.Service.HedgeBroker
 
                 options.WithMiddleware = builder =>
                 {
+                    builder.UseHandleBusinessExceptionsMiddleware();
                     builder.UseApiExceptionsMiddleware();
                 };
             });

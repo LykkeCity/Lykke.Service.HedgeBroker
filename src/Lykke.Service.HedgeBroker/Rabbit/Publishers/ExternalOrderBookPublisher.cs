@@ -1,30 +1,24 @@
 ﻿using System;
-using AutoMapper;
-using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Common.ExchangeAdapter.Contracts;
 using Lykke.Common.Log;
 using Lykke.RabbitMqBroker.Publisher;
 using Lykke.RabbitMqBroker.Subscriber;
-using Lykke.Service.HedgeBroker.Domain.Domain.OrderBooks;
-using Lykke.Service.HedgeBroker.Domain.Services;
-using Lykke.Service.HedgeBroker.Rabbit.Messages.ExternalOrderBook;
 using Lykke.Service.HedgeBroker.Settings;
 
 namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
 {
     [UsedImplicitly]
-    public class ExternalOrderBookPublisher : IExternalOrderBookPublisher, IDisposable
+    public class ExternalOrderBookPublisher : IDisposable
     {
         private readonly ILogFactory _logFactory;
         private readonly RabbitSettings _settings;
-        private RabbitMqPublisher<ExternalOrderBook> _publisher;
-        private readonly ILog _log;
+        private RabbitMqPublisher<OrderBook> _publisher;
 
         public ExternalOrderBookPublisher(ILogFactory logFactory, RabbitSettings settings)
         {
             _logFactory = logFactory;
             _settings = settings;
-            _log = logFactory.CreateLog(this);
         }
 
         public void Dispose()
@@ -34,9 +28,7 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
 
         public void Publish(OrderBook orderBook)
         {
-            ExternalOrderBook externalOrderBook = Mapper.Map<ExternalOrderBook>(orderBook);
-
-            _publisher.ProduceAsync(externalOrderBook);
+            _publisher.ProduceAsync(orderBook);
         }
 
         public void Start()
@@ -44,8 +36,8 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
             var settings = RabbitMqSubscriptionSettings
                 .CreateForPublisher(_settings.ConnectionString, _settings.Exchange);
 
-            _publisher = new RabbitMqPublisher<ExternalOrderBook>(_logFactory, settings)
-                .SetSerializer(new JsonMessageSerializer<ExternalOrderBook>())
+            _publisher = new RabbitMqPublisher<OrderBook>(_logFactory, settings)
+                .SetSerializer(new JsonMessageSerializer<OrderBook>())
                 .DisableInMemoryQueuePersistence()
                 .Start();
         }
