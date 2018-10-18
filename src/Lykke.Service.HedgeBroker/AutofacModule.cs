@@ -58,7 +58,8 @@ namespace Lykke.Service.HedgeBroker
 
             RegisterExchangeAdapters(builder);
             RegisterExchanges(builder);
-            RegisterRabbit(builder);
+            RegisterSubscribers(builder);
+            RegisterPublishers(builder);
         }
 
         private void RegisterExchangeAdapters(ContainerBuilder builder)
@@ -82,7 +83,7 @@ namespace Lykke.Service.HedgeBroker
                 .SingleInstance();
         }
 
-        private void RegisterRabbit(ContainerBuilder builder)
+        private void RegisterSubscribers(ContainerBuilder builder)
         {
             string targetExchange = _settings.CurrentValue.HedgeBrokerService.Proxy.TargetExchange;
 
@@ -99,17 +100,21 @@ namespace Lykke.Service.HedgeBroker
             builder.RegisterType<ExternalOrderBookSubscriber>()
                 .AsSelf()
                 .WithParameter(TypedParameter.From(targetExchangeSettings.Name))
-                .WithParameter(TypedParameter.From(targetExchangeSettings.Rabbit))
+                .WithParameter(TypedParameter.From(targetExchangeSettings.Rabbit.OrderBooks))
                 .Named<ExternalOrderBookSubscriber>(targetExchangeSettings.Name)
                 .SingleInstance();
 
-            builder.RegisterType<ExternalOrderBookSubscriber>()
+            builder.RegisterType<ExternalTickPriceSubscriber>()
                 .AsSelf()
                 .WithParameter(TypedParameter.From(targetExchangeSettings.Name))
-                .WithParameter(TypedParameter.From(targetExchangeSettings.Rabbit))
-                .Named<ExternalOrderBookSubscriber>(targetExchangeSettings.Name)
+                .WithParameter(TypedParameter.From(targetExchangeSettings.Rabbit.TickPrices))
+                .Named<ExternalTickPriceSubscriber>(targetExchangeSettings.Name)
                 .SingleInstance();
 
+        }
+
+        private void RegisterPublishers(ContainerBuilder builder)
+        {
             builder.RegisterType<ExternalOrderBookPublisher>()
                 .AsSelf()
                 .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Rabbit.OrderBooks))

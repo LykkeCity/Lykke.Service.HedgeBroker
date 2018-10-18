@@ -11,7 +11,7 @@ namespace Lykke.Service.HedgeBroker.Settings.ServiceSettings.Adapters
 
         public decimal Fee { get; set; }
 
-        public SubscriberSettings Rabbit { get; set; }
+        public RabbitSubscribersSettings Rabbit { get; set; }
 
         [Optional]
         public AdapterEndpoint Adapter { get; set; }
