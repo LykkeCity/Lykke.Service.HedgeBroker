@@ -3,7 +3,7 @@
 namespace Lykke.Service.HedgeBroker.Settings.ServiceSettings.Rabbit
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    public class RabbitSettings
+    public class RabbitPublishersSettings
     {
         public PublisherSettings OrderBooks { get; set; }
 
