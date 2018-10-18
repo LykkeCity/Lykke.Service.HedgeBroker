@@ -28,7 +28,8 @@ namespace Lykke.Service.HedgeBroker.Client
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
             if (string.IsNullOrWhiteSpace(settings.ServiceUrl))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(HedgeBrokerServiceClientSettings.ServiceUrl));
+                throw new ArgumentException("Value cannot be null or whitespace.",
+                    nameof(HedgeBrokerServiceClientSettings.ServiceUrl));
 
             var clientBuilder = HttpClientGenerator.HttpClientGenerator.BuildForUrl(settings.ServiceUrl)
                 .WithAdditionalCallsWrapper(new ExceptionHandlerCallsWrapper());

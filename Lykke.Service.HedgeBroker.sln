@@ -9,6 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. Solution items", "0. Sol
 		LICENSE = LICENSE
 		README.md = README.md
 		settings.yaml = settings.yaml
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		CODEOWNERS = CODEOWNERS
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Repositories", "2. Repositories", "{BF745453-B940-470E-81BC-43FB67703D4E}"

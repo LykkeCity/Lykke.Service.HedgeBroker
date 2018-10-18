@@ -1,19 +1,17 @@
-﻿using Lykke.Common.ExchangeAdapter.SpotController;
-using Lykke.HttpClientGenerator;
+﻿using Lykke.HttpClientGenerator;
 
 namespace Lykke.Service.HedgeBroker.Client
 {
     /// <summary>
-    /// HedgeBroker API aggregating interface.
+    /// Hedge broker service client.
     /// </summary>
     public class HedgeBrokerClient : IHedgeBrokerClient
     {
-        /// <summary>Inerface to HedgeBroker Api.</summary>
-        public ISpotController SpotApi { get; private set; }
-
+        /// <summary>
+        /// Initializes a new instance of <see cref="HedgeBrokerClient"/> with <param name="httpClientGenerator"></param>.
+        /// </summary> 
         public HedgeBrokerClient(IHttpClientGenerator httpClientGenerator)
         {
-            SpotApi = httpClientGenerator.Generate<ISpotController>();
         }
     }
 }

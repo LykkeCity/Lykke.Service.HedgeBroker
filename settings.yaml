@@ -1,35 +1,48 @@
 HedgeBrokerService:
-    Db:
-        LogsConnectionString:
-            settings-key: HedgeBrokerService-LogsConnectionString
-            types:
-              - AzureTableStorage
-    Rabbit:
+  Db:
+    LogsConnectionString:
+      settings-key: HedgeBrokerService-LogsConnectionString
+      types:
+      - AzureTableStorage
+
+  Rabbit:
+    OrderBooks:
       ConnectionString:
-        settings-key: HedgeBrokerService-Rabbit-ConnectionString
+        settings-key: HedgeBrokerService-Rabbit-OrderBooks-ConnectionString
+        types:
+            - RabbitMq
+      Exchange:
+        settings-key: HedgeBrokerService-Rabbit-OrderBooks-Exchange
+    
+    TickPrices:
+      ConnectionString:
+        settings-key: HedgeBrokerService-Rabbit-TickPrices-ConnectionString
         types:
           - RabbitMq
       Exchange:
-        settings-key: HedgeBrokerService-Rabbit-Exchange
+        settings-key: HedgeBrokerService-Rabbit-TickPrices-Exchange
 
-    Exchanges:
-        External:
-            settings-key: HedgeBrokerService-Exchanges-External
-            types:
-                - JsonArray
+  Exchanges:
+    settings-key: HedgeBrokerService-Exchanges-External
+    types:
+    - JsonArray
 
-    Exchange:
-        settings-key: HedgeBrokerService-Proxy-Exchange
+  Proxy:
+    TargetExchange:
+      settings-key: HedgeBrokerService-Proxy-TargetExchange
+
+  ExchangeName:
+    settings-key: HedgeBrokerService-Proxy-ExchangeName
 
 SlackNotifications:
-    AzureQueue:
-        ConnectionString:
-            settings-key: SlackNotificationsConnString
-            types:
-                - AzureTableStorage
-        QueueName:
-            settings-key: SlackQueueName
-MonitoringServiceClient:
-    MonitoringServiceUrl:
-        settings-key: MonitoringServiceUrl
+  AzureQueue:
+    ConnectionString:
+      settings-key: SlackNotificationsConnString
+      types:
+      - AzureTableStorage
+    QueueName:
+      settings-key: SlackQueueName
 
+MonitoringServiceClient:
+  MonitoringServiceUrl:
+    settings-key: MonitoringServiceUrl

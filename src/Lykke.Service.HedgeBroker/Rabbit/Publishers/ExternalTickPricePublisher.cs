@@ -9,13 +9,13 @@ using Lykke.Service.HedgeBroker.Settings.ServiceSettings.Rabbit;
 namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
 {
     [UsedImplicitly]
-    public class ExternalOrderBookPublisher : IDisposable
+    public class ExternalTickPricePublisher : IDisposable
     {
         private readonly ILogFactory _logFactory;
         private readonly PublisherSettings _settings;
-        private RabbitMqPublisher<OrderBook> _publisher;
+        private RabbitMqPublisher<TickPrice> _publisher;
 
-        public ExternalOrderBookPublisher(ILogFactory logFactory, PublisherSettings settings)
+        public ExternalTickPricePublisher(ILogFactory logFactory, PublisherSettings settings)
         {
             _logFactory = logFactory;
             _settings = settings;
@@ -26,18 +26,18 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
             _publisher?.Dispose();
         }
 
-        public void Publish(OrderBook orderBook)
+        public void Publish(TickPrice tickPrice)
         {
-            _publisher.ProduceAsync(orderBook);
+            _publisher.ProduceAsync(tickPrice);
         }
 
         public void Start()
         {
             var settings = RabbitMqSubscriptionSettings
                 .CreateForPublisher(_settings.ConnectionString, _settings.Exchange);
-            
-            _publisher = new RabbitMqPublisher<OrderBook>(_logFactory, settings)
-                .SetSerializer(new JsonMessageSerializer<OrderBook>())
+
+            _publisher = new RabbitMqPublisher<TickPrice>(_logFactory, settings)
+                .SetSerializer(new JsonMessageSerializer<TickPrice>())
                 .DisableInMemoryQueuePersistence()
                 .Start();
         }

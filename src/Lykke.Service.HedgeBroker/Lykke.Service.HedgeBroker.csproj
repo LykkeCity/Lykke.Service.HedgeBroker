@@ -12,7 +12,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp2.0\Lykke.Service.HedgeBroker.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Update="Dockerfile">
@@ -32,9 +32,6 @@
     <ProjectReference Include="..\Lykke.Service.HedgeBroker.AzureRepositories\Lykke.Service.HedgeBroker.AzureRepositories.csproj" />
     <ProjectReference Include="..\Lykke.Service.HedgeBroker.DomainServices\Lykke.Service.HedgeBroker.DomainServices.csproj" />
     <ProjectReference Include="..\Lykke.Service.HedgeBroker.Domain\Lykke.Service.HedgeBroker.Domain.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <ItemGroup>

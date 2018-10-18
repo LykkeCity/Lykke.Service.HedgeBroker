@@ -1,7 +1,8 @@
 ﻿using JetBrains.Annotations;
+using Lykke.Service.HedgeBroker.Settings.ServiceSettings.Rabbit;
 using Lykke.SettingsReader.Attributes;
 
-namespace Lykke.Service.HedgeBroker.Settings.Exchanges.External
+namespace Lykke.Service.HedgeBroker.Settings.ServiceSettings.Adapters
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class ExternalExchangeSettings
@@ -10,7 +11,7 @@ namespace Lykke.Service.HedgeBroker.Settings.Exchanges.External
 
         public decimal Fee { get; set; }
 
-        public ExchangeSettings Rabbit { get; set; }
+        public SubscriberSettings Rabbit { get; set; }
 
         [Optional]
         public AdapterEndpoint Adapter { get; set; }

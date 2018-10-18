@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Lykke.Service.HedgeBroker.Domain;
 using Lykke.Service.HedgeBroker.Domain.Services;
-using Lykke.Service.HedgeBroker.Domain.Settings;
 
 namespace Lykke.Service.HedgeBroker.DomainServices
 {

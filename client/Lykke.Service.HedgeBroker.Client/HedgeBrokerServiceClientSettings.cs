@@ -1,14 +1,18 @@
-﻿using Lykke.SettingsReader.Attributes;
+﻿using JetBrains.Annotations;
+using Lykke.SettingsReader.Attributes;
 
-namespace Lykke.Service.HedgeBroker.Client 
+namespace Lykke.Service.HedgeBroker.Client
 {
     /// <summary>
-    /// HedgeBroker client settings.
+    /// Settings for Hedge broker service client.
     /// </summary>
-    public class HedgeBrokerServiceClientSettings 
+    [PublicAPI]
+    public class HedgeBrokerServiceClientSettings
     {
-        /// <summary>Service url.</summary>
+        /// <summary>
+        /// Service url.
+        /// </summary>
         [HttpCheck("api/isalive")]
-        public string ServiceUrl {get; set;}
+        public string ServiceUrl { get; set; }
     }
 }
