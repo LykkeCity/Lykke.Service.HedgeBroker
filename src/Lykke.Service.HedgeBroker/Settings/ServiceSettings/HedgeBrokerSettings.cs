@@ -10,10 +10,12 @@ namespace Lykke.Service.HedgeBroker.Settings.ServiceSettings
     {
         public DbSettings Db { get; set; }
 
-        public PublisherSettings Rabbit { get; set; }
+        public RabbitSettings Rabbit { get; set; }
 
         public ExternalExchangeSettings[] Exchanges { get; set; }
 
-        public string Exchange { get; set; }
+        public ProxySettings Proxy { get; set; }
+
+        public string ExchangeName { get; set; }
     }
 }

@@ -6,24 +6,24 @@ using Lykke.Service.HedgeBroker.Rabbit.Publishers;
 namespace Lykke.Service.HedgeBroker.Handlers
 {
     [UsedImplicitly]
-    public class ExternalOrderBookHandler 
+    public class ExternalTickPriceHandler 
     {
         private readonly string _exchangeName;
-        private readonly ExternalOrderBookPublisher _orderBookPublisher;
+        private readonly ExternalTickPricePublisher _tickPricePublisher;
 
-        public ExternalOrderBookHandler(
+        public ExternalTickPriceHandler(
             string exchangeName,
-            ExternalOrderBookPublisher orderBookPublisher)
+            ExternalTickPricePublisher tickPricePublisher)
         {
             _exchangeName = exchangeName;
-            _orderBookPublisher = orderBookPublisher;
+            _tickPricePublisher = tickPricePublisher;
         }
 
-        public Task HandleAsync(OrderBook orderBook)
+        public Task HandleAsync(TickPrice tickPrice)
         {
-            orderBook.Source = _exchangeName;
+            tickPrice.Source = _exchangeName;
 
-            _orderBookPublisher.Publish(orderBook);
+            _tickPricePublisher.Publish(tickPrice);
 
             return Task.CompletedTask;
         }

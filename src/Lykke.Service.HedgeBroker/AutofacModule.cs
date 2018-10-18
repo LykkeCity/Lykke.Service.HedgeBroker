@@ -48,7 +48,12 @@ namespace Lykke.Service.HedgeBroker
 
             builder.RegisterType<ExternalOrderBookHandler>()
                 .AsSelf()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Exchange))
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.ExchangeName))
+                .SingleInstance();
+
+            builder.RegisterType<ExternalTickPriceHandler>()
+                .AsSelf()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.ExchangeName))
                 .SingleInstance();
 
             RegisterExchangeAdapters(builder);
@@ -60,9 +65,11 @@ namespace Lykke.Service.HedgeBroker
         {
             IReadOnlyDictionary<string, Common.ExchangeAdapter.Client.AdapterEndpoint> endpoints =
                 _settings.CurrentValue.HedgeBrokerService.Exchanges
-                    .Where(e => e.Adapter != null).ToDictionary(o => o.Name,
-                        v => new Common.ExchangeAdapter.Client.AdapterEndpoint(v.Adapter.ApiKey,
-                            new Uri(v.Adapter.Url)));
+                    .Where(e => e.Adapter != null)
+                    .ToDictionary(
+                        o => o.Name,
+                        v => new Common.ExchangeAdapter.Client.AdapterEndpoint(
+                            v.Adapter.ApiKey, new Uri(v.Adapter.Url)));
 
             builder.RegisterInstance(new ExchangeAdapterClientFactory(endpoints));
         }
@@ -71,26 +78,46 @@ namespace Lykke.Service.HedgeBroker
         {
             builder.RegisterType<ExternalExchange>()
                 .As<IExternalExchange>()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Exchange))
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Proxy.TargetExchange))
                 .SingleInstance();
         }
 
         private void RegisterRabbit(ContainerBuilder builder)
         {
-            foreach (ExternalExchangeSettings externalExchangeSettings in _settings.CurrentValue.HedgeBrokerService
-                .Exchanges)
+            string targetExchange = _settings.CurrentValue.HedgeBrokerService.Proxy.TargetExchange;
+
+            ExternalExchangeSettings targetExchangeSettings =
+                _settings.CurrentValue.HedgeBrokerService.Exchanges
+                    .FirstOrDefault(o =>
+                        string.Equals(o.Name, targetExchange, StringComparison.InvariantCultureIgnoreCase));
+
+            if (targetExchangeSettings == null)
             {
-                builder.RegisterType<ExternalOrderBookSubscriber>()
-                    .AsSelf()
-                    .WithParameter(TypedParameter.From(externalExchangeSettings.Name))
-                    .WithParameter(TypedParameter.From(externalExchangeSettings.Rabbit))
-                    .Named<ExternalOrderBookSubscriber>(externalExchangeSettings.Name)
-                    .SingleInstance();
+                throw new InvalidOperationException("Target exchange's settings are not found.");
             }
+
+            builder.RegisterType<ExternalOrderBookSubscriber>()
+                .AsSelf()
+                .WithParameter(TypedParameter.From(targetExchangeSettings.Name))
+                .WithParameter(TypedParameter.From(targetExchangeSettings.Rabbit))
+                .Named<ExternalOrderBookSubscriber>(targetExchangeSettings.Name)
+                .SingleInstance();
+
+            builder.RegisterType<ExternalOrderBookSubscriber>()
+                .AsSelf()
+                .WithParameter(TypedParameter.From(targetExchangeSettings.Name))
+                .WithParameter(TypedParameter.From(targetExchangeSettings.Rabbit))
+                .Named<ExternalOrderBookSubscriber>(targetExchangeSettings.Name)
+                .SingleInstance();
 
             builder.RegisterType<ExternalOrderBookPublisher>()
                 .AsSelf()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Rabbit))
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Rabbit.OrderBooks))
+                .SingleInstance();
+
+            builder.RegisterType<ExternalTickPricePublisher>()
+                .AsSelf()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.HedgeBrokerService.Rabbit.TickPrices))
                 .SingleInstance();
         }
     }

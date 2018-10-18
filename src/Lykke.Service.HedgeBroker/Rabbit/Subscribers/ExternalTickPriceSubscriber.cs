@@ -12,22 +12,22 @@ using Lykke.Service.HedgeBroker.Settings.ServiceSettings.Rabbit;
 namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
 {
     [UsedImplicitly]
-    public class ExternalOrderBookSubscriber : IDisposable
+    public class ExternalTickPriceSubscriber : IDisposable
     {
         private readonly SubscriberSettings _settings;
-        private readonly ExternalOrderBookHandler _externalOrderBookHandler;
+        private readonly ExternalTickPriceHandler _externalTickPriceHandler;
         private readonly ILogFactory _logFactory;
         private readonly ILog _log;
 
-        private RabbitMqSubscriber<OrderBook> _subscriber;
+        private RabbitMqSubscriber<TickPrice> _subscriber;
 
-        public ExternalOrderBookSubscriber(
+        public ExternalTickPriceSubscriber(
             SubscriberSettings settings,
-            ExternalOrderBookHandler externalOrderBookHandler,
+            ExternalTickPriceHandler externalTickPriceHandler,
             ILogFactory logFactory)
         {
             _settings = settings;
-            _externalOrderBookHandler = externalOrderBookHandler;
+            _externalTickPriceHandler = externalTickPriceHandler;
             _logFactory = logFactory;
             _log = logFactory.CreateLog(this);
         }
@@ -40,9 +40,9 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
             settings.DeadLetterExchangeName = null;
             settings.IsDurable = false;
 
-            _subscriber = new RabbitMqSubscriber<OrderBook>(_logFactory, settings,
+            _subscriber = new RabbitMqSubscriber<TickPrice>(_logFactory, settings,
                     new ResilientErrorHandlingStrategy(_logFactory, settings, TimeSpan.FromSeconds(10)))
-                .SetMessageDeserializer(new JsonMessageDeserializer<OrderBook>())
+                .SetMessageDeserializer(new JsonMessageDeserializer<TickPrice>())
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(ProcessMessageAsync)
                 .CreateDefaultBinding()
@@ -59,15 +59,15 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
             _subscriber?.Dispose();
         }
 
-        private async Task ProcessMessageAsync(OrderBook message)
+        private async Task ProcessMessageAsync(TickPrice message)
         {
             try
             {
-                await _externalOrderBookHandler.HandleAsync(message);
+                await _externalTickPriceHandler.HandleAsync(message);
             }
             catch (Exception exception)
             {
-                _log.Error(exception, "An error occurred during processing external order book", message);
+                _log.Error(exception, "An error occurred during processing external tick price", message);
             }
         }
     }
