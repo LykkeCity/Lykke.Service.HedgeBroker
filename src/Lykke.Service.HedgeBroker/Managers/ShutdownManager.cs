@@ -10,14 +10,20 @@ namespace Lykke.Service.HedgeBroker.Managers
     public class ShutdownManager : IShutdownManager
     {
         private readonly ExternalOrderBookSubscriber[] _externalOrderBookSubscribers;
-        private readonly ExternalOrderBookPublisher _publisher;
+        private readonly ExternalTickPriceSubscriber[] _externalTickPriceSubscribers;
+        private readonly ExternalOrderBookPublisher _orderBookPublisher;
+        private readonly ExternalTickPricePublisher _tickPricePublisher;
 
         public ShutdownManager(
             ExternalOrderBookSubscriber[] externalOrderBookSubscribers,
-            ExternalOrderBookPublisher publisher)
+            ExternalTickPriceSubscriber[] externalTickPriceSubscribers,
+            ExternalOrderBookPublisher orderBookPublisher,
+            ExternalTickPricePublisher tickPricePublisher)
         {
             _externalOrderBookSubscribers = externalOrderBookSubscribers;
-            _publisher = publisher;
+            _externalTickPriceSubscribers = externalTickPriceSubscribers;
+            _orderBookPublisher = orderBookPublisher;
+            _tickPricePublisher = tickPricePublisher;
         }
 
         public Task StopAsync()
@@ -25,7 +31,11 @@ namespace Lykke.Service.HedgeBroker.Managers
             foreach (ExternalOrderBookSubscriber externalOrderBookSubscriber in _externalOrderBookSubscribers)
                 externalOrderBookSubscriber.Stop();
 
-            _publisher.Stop();
+            foreach (ExternalTickPriceSubscriber externalTickPriceSubscriber in _externalTickPriceSubscribers)
+                externalTickPriceSubscriber.Stop();
+
+            _orderBookPublisher.Stop();
+            _tickPricePublisher.Stop();
 
             return Task.CompletedTask;
         }
