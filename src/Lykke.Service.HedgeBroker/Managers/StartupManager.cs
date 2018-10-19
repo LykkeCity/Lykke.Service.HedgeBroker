@@ -10,22 +10,32 @@ namespace Lykke.Service.HedgeBroker.Managers
     public class StartupManager : IStartupManager
     {
         private readonly ExternalOrderBookSubscriber[] _externalOrderBookSubscribers;
-        private readonly ExternalOrderBookPublisher _publisher;
+        private readonly ExternalTickPriceSubscriber[] _externalTickPriceSubscribers;
+        private readonly ExternalOrderBookPublisher _orderBookPublisher;
+        private readonly ExternalTickPricePublisher _tickPricePublisher;
 
         public StartupManager(
             ExternalOrderBookSubscriber[] externalOrderBookSubscribers,
-            ExternalOrderBookPublisher publisher)
+            ExternalTickPriceSubscriber[] externalTickPriceSubscribers,
+            ExternalOrderBookPublisher orderBookPublisher,
+            ExternalTickPricePublisher tickPricePublisher)
         {
             _externalOrderBookSubscribers = externalOrderBookSubscribers;
-            _publisher = publisher;
+            _externalTickPriceSubscribers = externalTickPriceSubscribers;
+            _orderBookPublisher = orderBookPublisher;
+            _tickPricePublisher = tickPricePublisher;
         }
 
         public Task StartAsync()
         {
-            _publisher.Start();
+            _orderBookPublisher.Start();
+            _tickPricePublisher.Start();
 
             foreach (ExternalOrderBookSubscriber externalOrderBookSubscriber in _externalOrderBookSubscribers)
                 externalOrderBookSubscriber.Start();
+
+            foreach (ExternalTickPriceSubscriber externalTickPriceSubscriber in _externalTickPriceSubscribers)
+                externalTickPriceSubscriber.Start();
 
             return Task.CompletedTask;
         }
