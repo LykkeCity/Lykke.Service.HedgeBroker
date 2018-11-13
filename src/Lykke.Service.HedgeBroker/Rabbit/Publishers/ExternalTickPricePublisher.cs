@@ -34,7 +34,7 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Publishers
         public void Start()
         {
             var settings = RabbitMqSubscriptionSettings
-                .CreateForPublisher(_settings.ConnectionString, _settings.Exchange);
+                .ForPublisher(_settings.ConnectionString, _settings.Exchange);
 
             _publisher = new RabbitMqPublisher<TickPrice>(_logFactory, settings)
                 .SetSerializer(new JsonMessageSerializer<TickPrice>())
