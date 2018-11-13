@@ -35,7 +35,7 @@ namespace Lykke.Service.HedgeBroker.Rabbit.Subscribers
         public void Start()
         {
             var settings = RabbitMqSubscriptionSettings
-                .CreateForSubscriber(_settings.ConnectionString, _settings.Exchange, _settings.QueueSuffix);
+                .ForSubscriber(_settings.ConnectionString, _settings.Exchange, _settings.QueueSuffix);
 
             settings.DeadLetterExchangeName = null;
             settings.IsDurable = false;
