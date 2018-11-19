@@ -3,19 +3,15 @@
 namespace Lykke.Service.HedgeBroker.Client
 {
     /// <summary>
-    /// HedgeBroker API aggregating interface.
+    /// Hedge broker service client.
     /// </summary>
     public class HedgeBrokerClient : IHedgeBrokerClient
     {
-        // Note: Add similar Api properties for each new service controller
-
-        /// <summary>Inerface to HedgeBroker Api.</summary>
-        public IHedgeBrokerApi Api { get; private set; }
-
-        /// <summary>C-tor</summary>
+        /// <summary>
+        /// Initializes a new instance of <see cref="HedgeBrokerClient"/> with <param name="httpClientGenerator"></param>.
+        /// </summary> 
         public HedgeBrokerClient(IHttpClientGenerator httpClientGenerator)
         {
-            Api = httpClientGenerator.Generate<IHedgeBrokerApi>();
         }
     }
 }

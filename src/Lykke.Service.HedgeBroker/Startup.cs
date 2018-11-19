@@ -4,6 +4,8 @@ using Lykke.Service.HedgeBroker.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Lykke.Common.ExchangeAdapter.Server;
+using Lykke.Service.HedgeBroker.Middleware;
 
 namespace Lykke.Service.HedgeBroker
 {
@@ -26,7 +28,8 @@ namespace Lykke.Service.HedgeBroker
                 options.Logs = logs =>
                 {
                     logs.AzureTableName = "HedgeBrokerLog";
-                    logs.AzureTableConnectionStringResolver = settings => settings.HedgeBrokerService.Db.LogsConnectionString;
+                    logs.AzureTableConnectionStringResolver =
+                        settings => settings.HedgeBrokerService.Db.LogsConnectionString;
                 };
             });
         }
@@ -37,6 +40,12 @@ namespace Lykke.Service.HedgeBroker
             app.UseLykkeConfiguration(options =>
             {
                 options.SwaggerOptions = _swaggerOptions;
+
+                options.WithMiddleware = builder =>
+                {
+                    builder.UseHandleBusinessExceptionsMiddleware();
+                    builder.UseApiExceptionsMiddleware();
+                };
             });
         }
     }
